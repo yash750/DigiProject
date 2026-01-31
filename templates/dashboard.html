@@ -1,0 +1,109 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<div style="margin-bottom: 5vh; display: flex; gap: 2.4vw;">
+    <a href="/assign-page">
+        <button class="assign-btn button-52">Assign Asset</button>
+    </a>
+
+    <a href="#inventory-section">
+        <button class="button-52">
+            View Inventory Summary ⬇
+        </button>
+    </a>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2>All Assets</h2>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Serial</th>
+                <th>Status</th>
+                <th>Current Holder</th>
+                <th>Action</th>
+                <th>History</th> </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td>{{ asset.name }}</td>
+                <td>{{ asset.serial_number }}</td>
+                <td>
+                    {% if asset.status == 'available' %}
+                        <span style="color: var(--success); font-weight:400;">Available</span>
+                    {% elif asset.status == 'assigned' %}
+                        <span style="color: var(--primary); font-weight:400;">Assigned</span>
+                    {% else %}
+                        {{ asset.status }}
+                    {% endif %}
+                </td>
+                <td>{{ asset.current_holder.name if asset.current_holder else "—" }}</td>
+                <td>
+                    {% if asset.status == "assigned" %}
+                    <form action="/return-form/{{ asset.id }}" method="post" style="display:inline;">
+                        <button class="return-btn">Return</button>
+                    </form>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/asset/{{ asset.id }}/history" style="color: var(--primary); font-weight: 400;">
+                        View History
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="height: 10vh;"></div>
+
+<div class="card" id="inventory-section">
+    <h2>Inventory Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Total Units</th>
+                <th>Remaining (Available)</th>
+                <th>Stock Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if summary %}
+                {% for name, stats in summary.items() %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ stats.total }}</td>
+                    <td>{{ stats.available }}</td>
+                    <td>
+                        {% if stats.available == 0 %}
+                            <span style="color: var(--danger);">Out of Stock</span>
+                        {% elif stats.available == stats.total %}
+                            <span style="color: var(--success);">Full Stock</span>
+                        {% else %}
+                            <span style="color: var(--primary);">In Use</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4" style="text-align:center; color: var(--text-muted);">No summary data available. (Did you update route.py?)</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div style="height: 50px;"></div>
+
+{% endblock %}

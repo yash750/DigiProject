@@ -1,0 +1,23 @@
+# --- Python & Flask Standard ---
+venv/
+__pycache__/
+*.py[cod]
+
+# --- Database & Configs ---
+# Ignore the actual database file
+*.db
+*.sqlite3
+
+# Ignore the local instance folder (holds the local DB)
+instance/
+
+# --- Migrations ---
+# IGNORED so the user can run 'flask db init' themselves
+migrations/
+
+# --- Environment Variables ---
+.env
+
+# --- OS Metadata ---
+.DS_Store
+Thumbs.db

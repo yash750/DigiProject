@@ -1,0 +1,24 @@
+{% extends "index.html" %}
+
+{% block content %}
+<h2>History for {{ asset.name }} ({{ asset.serial_number }})</h2>
+
+<table>
+    <tr>
+        <th>Assigned To</th>
+        <th>Assigned By</th>
+        <th>Assigned At</th>
+        <th>Returned At</th>
+    </tr>
+
+    {% for h in history %}
+    <tr>
+        <td>{{ h.assigned_to_user.name }}</td>
+        <td>{{ h.assigned_by_user.name }}</td>
+        <td>{{ h.assigned_at }}</td>
+        <td>{{ h.returned_at if h.returned_at else "Still Assigned" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<button class="button-52" onclick="window.location.href='/'" style="margin-top: 3vh;">Back to Dashboard</button>
+{% endblock %}

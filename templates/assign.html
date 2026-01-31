@@ -1,0 +1,45 @@
+{% extends "index.html" %}
+
+{% block content %}
+<button class="button-52" onclick="window.location.href='/'" style="margin-bottom: 4vh;">Back to Dashboard</button>
+
+<div class="form-container">
+  <form method="post" action="/assign-form" id="assign-form">
+    <p>Assign Asset</p>
+    
+    <label>Asset</label>
+    <select name="asset_id" required>
+      <option value="" disabled selected>Select an Asset</option> 
+      {% for a in assets %}
+        {% if a.status == "available" %}
+          <option value="{{ a.id }}">{{ a.name }} ({{ a.serial_number }})</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+
+    <label>Assign To</label>
+    <select name="to_user_id">
+      {% for u in users %}
+        <option value="{{ u.id }}">{{ u.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Assigned By</label>
+    <select name="by_user_id">
+      {% for u in users %}
+        <option value="{{ u.id }}">{{ u.name }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="button-86">Assign</button>
+  </form>
+
+  <div class="drops">
+    <div class="drop drop-1"></div>
+    <div class="drop drop-2"></div>
+    <div class="drop drop-3"></div>
+    <div class="drop drop-4"></div>
+    <div class="drop drop-5"></div>
+  </div>
+</div>
+{% endblock %}
