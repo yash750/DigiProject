@@ -90,18 +90,6 @@ Open your browser and navigate to: `http://127.0.0.1:5000`
 
 ---
 
-## System Design Decisions
-
-This project was built with a focus on system integrity rather than just features.
-
-* **Assignment Table for Audit Trail:** Instead of simply storing a `current_owner` on the Asset table, we use a dedicated `Assignment` table. This creates an immutable history log of every transfer.
-* **Derived State:** The "Current Holder" is calculated dynamically based on the latest open assignment. This prevents **State Drift** (where the history says one thing, but the asset table says another).
-* **Performance Optimization:** Solved the *N+1 query problem* by using efficient SQLAlchemy loading strategies and aggregation for the inventory summary.
-* **Aggregation View:** Added a real-time "Inventory Summary" on the dashboard to show stock levels at a glance without expensive calculations on the frontend.
-* **Minimalist UI:** The interface is kept simple to strictly focus on the system design and data modeling aspects.
-
----
-
 ## ⚠️ Out of Scope
 
 To maintain focus on core custody tracking and accountability, the following were intentionally **excluded**:
