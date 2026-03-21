@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
-from services.asset_service import assign_asset, return_asset
+from services.asset_service import assign_asset, return_asset, create_asset, delete_asset
 from models.asset import Asset
 from models.user import User
 from models.assignment import Assignment
+from models.asset_log import AssetLog
 asset_bp = Blueprint("asset_bp", __name__)
 
 
@@ -18,10 +19,112 @@ def asset_history(asset_id):
     )
     return render_template("history.html", asset=asset, history=history)
 
-@asset_bp.route("/assets", methods=["GET"])
-def list_assets():
-    assets = Asset.query.all()
-    return jsonify([a.to_dict() for a in assets])
+
+@asset_bp.route("/asset/<int:asset_id>/history/json")
+def asset_history_json(asset_id):
+    """Full lifecycle timeline for one asset, consumed by the React frontend."""
+    asset = Asset.query.get_or_404(asset_id)
+
+    # Assignment records (assign + return pairs)
+    assignments = (
+        Assignment.query
+        .filter_by(asset_id=asset_id)
+        .order_by(Assignment.assigned_at.desc())
+        .all()
+    )
+
+    # Audit log entries for this asset
+    logs = (
+        AssetLog.query
+        .filter_by(asset_id=asset_id)
+        .order_by(AssetLog.timestamp.desc())
+        .all()
+    )
+
+    # Build a unified timeline: one entry per assignment (covers assign + return),
+    # plus created/deleted log entries that have no assignment row.
+    assignment_events = [
+        {
+            "type":        "assignment",
+            "assigned_to": h.assigned_to_user.name,
+            "assigned_by": h.assigned_by_user.name,
+            "assigned_at": h.assigned_at.isoformat() if h.assigned_at else None,
+            "returned_at": h.returned_at.isoformat() if h.returned_at else None,
+            "notes":       h.notes,
+            "timestamp":   h.assigned_at.isoformat() if h.assigned_at else None,
+        }
+        for h in assignments
+    ]
+
+    log_events = [
+        {
+            "type":      "log",
+            "event":     l.event,
+            "actor":     l.actor,
+            "detail":    l.detail,
+            "timestamp": l.timestamp.isoformat() if l.timestamp else None,
+        }
+        for l in logs
+        if l.event in (AssetLog.EVENT_CREATED, AssetLog.EVENT_DELETED)
+    ]
+
+    # Merge and sort newest-first
+    timeline = sorted(
+        assignment_events + log_events,
+        key=lambda x: x["timestamp"] or "",
+        reverse=True,
+    )
+
+    return jsonify({
+        "asset":    {"id": asset.id, "name": asset.name, "serial_number": asset.serial_number, "status": asset.status},
+        "timeline": timeline,
+    })
+
+
+@asset_bp.route("/activity/json")
+def global_activity_json():
+    """Global activity feed — every event across all assets, newest first."""
+    logs = (
+        AssetLog.query
+        .order_by(AssetLog.timestamp.desc())
+        .limit(200)
+        .all()
+    )
+    return jsonify([l.to_dict() for l in logs])
+
+@asset_bp.route("/assets", methods=["GET", "POST"])
+def assets_api():
+    if request.method == "GET":
+        assets = Asset.query.all()
+        return jsonify([a.to_dict() for a in assets])
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+    if not data.get("name") or not data.get("serial_number"):
+        return jsonify({"error": "name and serial_number are required"}), 400
+    try:
+        asset = create_asset(
+            name=data["name"],
+            serial_number=data["serial_number"],
+            status=data.get("status"),
+        )
+        return jsonify(asset.to_dict()), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception:
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
+@asset_bp.route("/assets/<int:asset_id>", methods=["DELETE"])
+def delete_asset_api(asset_id):
+    try:
+        delete_asset(asset_id)
+        return jsonify({"message": "Asset deleted"}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception:
+        return jsonify({"error": "Internal Server Error"}), 500
 
 
 @asset_bp.route("/users", methods=["GET"])
