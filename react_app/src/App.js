@@ -2,10 +2,14 @@ import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import { ToastProvider } from "./components/Toast";
-import Dashboard     from "./pages/Dashboard";
-import AssignPage    from "./pages/AssignPage";
-import AddAssetPage  from "./pages/AddAssetPage";
-import HistoryPage   from "./pages/HistoryPage";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import QuickActionsWidget from "./components/QuickActionsWidget";
+import LoginPage    from "./pages/LoginPage";
+import Dashboard    from "./pages/Dashboard";
+import AssignPage   from "./pages/AssignPage";
+import AddAssetPage from "./pages/AddAssetPage";
+import HistoryPage  from "./pages/HistoryPage";
 import InventoryPage from "./pages/InventoryPage";
 
 const pageMeta = {
@@ -16,10 +20,13 @@ const pageMeta = {
   "/inventory": { title: "Inventory",    sub: "Stock levels and asset type breakdown" },
 };
 
-export default function App() {
+function AppShell() {
   const { pathname } = useLocation();
   const base = "/" + pathname.split("/")[1];
   const meta = pageMeta[base] || { title: "Asset Tracker", sub: "" };
+
+  // Login page renders without the shell
+  if (pathname === "/login") return <Routes><Route path="/login" element={<LoginPage />} /></Routes>;
 
   return (
     <ToastProvider>
@@ -41,16 +48,37 @@ export default function App() {
 
           <main className="page-content">
             <Routes>
-              <Route path="/"                 element={<Dashboard />}    />
-              <Route path="/assign"           element={<AssignPage />}   />
-              <Route path="/add-asset"        element={<AddAssetPage />} />
-              <Route path="/history/:assetId" element={<HistoryPage />}  />
-              <Route path="/history"          element={<HistoryPage />}  />
-              <Route path="/inventory"        element={<InventoryPage />} />
+              <Route path="/" element={
+                <ProtectedRoute><Dashboard /></ProtectedRoute>
+              } />
+              <Route path="/assign" element={
+                <ProtectedRoute><AssignPage /></ProtectedRoute>
+              } />
+              <Route path="/add-asset" element={
+                <ProtectedRoute adminOnly><AddAssetPage /></ProtectedRoute>
+              } />
+              <Route path="/history/:assetId" element={
+                <ProtectedRoute><HistoryPage /></ProtectedRoute>
+              } />
+              <Route path="/history" element={
+                <ProtectedRoute><HistoryPage /></ProtectedRoute>
+              } />
+              <Route path="/inventory" element={
+                <ProtectedRoute><InventoryPage /></ProtectedRoute>
+              } />
             </Routes>
           </main>
         </div>
       </div>
+      <QuickActionsWidget />
     </ToastProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppShell />
+    </AuthProvider>
   );
 }

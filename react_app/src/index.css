@@ -419,6 +419,271 @@ tbody tr:hover td { background: #f8fafc; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Quick Actions Widget ── */
+.qaw-root {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+/* FAB — Affordance: raised shadow + scale on hover */
+.qaw-fab {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.3rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.45);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.15s, background 0.15s;
+}
+.qaw-fab:hover  { transform: scale(1.08); background: var(--primary-dark); }
+.qaw-fab--open  { background: #475569; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+/* Panel */
+.qaw-panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  width: 272px;
+  overflow: hidden;
+  animation: qawSlideUp 0.18s ease;
+}
+
+@keyframes qawSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Header — Hierarchy */
+.qaw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.qaw-title { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.qaw-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: 0.85rem; padding: 2px 6px;
+  border-radius: 4px; transition: background 0.12s;
+}
+.qaw-close:hover { background: #f1f5f9; color: var(--text); }
+
+/* Health Bar — Feedback */
+.qaw-health { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.qaw-health-label {
+  display: flex; justify-content: space-between;
+  font-size: 0.78rem; font-weight: 500; color: var(--text-muted);
+  margin-bottom: 7px;
+}
+.qaw-bar-track {
+  height: 7px; background: var(--border); border-radius: 999px; overflow: hidden;
+}
+.qaw-bar-fill {
+  height: 100%; border-radius: 999px;
+  transition: width 0.5s ease, background 0.3s;
+}
+.qaw-mini-stats {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+}
+.qaw-mini-stats .badge { font-size: 0.7rem; padding: 2px 8px; }
+
+/* Loading dot — Feedback */
+.qaw-loading-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: qawPulse 0.9s ease-in-out infinite alternate;
+}
+@keyframes qawPulse { from { opacity: 0.3; } to { opacity: 1; } }
+
+/* Actions — Consistency: reuse .btn */
+.qaw-actions {
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.qaw-btn { width: 100%; justify-content: flex-start; font-size: 0.83rem; }
+
+/* Footer — Hierarchy: subdued */
+.qaw-footer {
+  padding: 8px 16px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+/* ── Auth: Login Page ── */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.login-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-brand-icon { font-size: 2.2rem; }
+
+.login-brand-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 8px;
+}
+
+.login-brand-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.login-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.login-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.83rem;
+  margin-bottom: 16px;
+}
+
+.login-pass-wrap { position: relative; }
+
+.login-pass-wrap input { padding-right: 44px; }
+
+.login-pass-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px;
+  line-height: 1;
+}
+
+.login-spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.login-hint {
+  margin-top: 24px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  border: 1px solid var(--border);
+}
+
+/* ── Auth: Sidebar User Block ── */
+.sidebar-user {
+  margin: 0 12px 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sidebar-user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-user-details { min-width: 0; }
+
+.sidebar-user-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-role-badge {
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-top: 3px;
+}
+
+.sidebar-role-badge.admin    { background: #fef3c7; color: #92400e; }
+.sidebar-role-badge.employee { background: #e0f2fe; color: #0369a1; }
+
+.sidebar-logout-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.sidebar-logout-btn:hover { background: rgba(239,68,68,0.15); color: #ef4444; }
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }

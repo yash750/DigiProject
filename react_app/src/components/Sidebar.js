@@ -1,15 +1,25 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const links = [
-  { to: "/",          icon: "📊", label: "Dashboard"   },
-  { to: "/assign",    icon: "🔗", label: "Assign Asset" },
-  { to: "/add-asset", icon: "➕", label: "Add Asset"    },
-  { to: "/history",   icon: "📋", label: "History"      },
-  { to: "/inventory", icon: "📦", label: "Inventory"    },
+const allLinks = [
+  { to: "/",          icon: "📊", label: "Dashboard",   adminOnly: false },
+  { to: "/assign",    icon: "🔗", label: "Assign Asset", adminOnly: false },
+  { to: "/add-asset", icon: "➕", label: "Add Asset",    adminOnly: true  },
+  { to: "/history",   icon: "📋", label: "History",      adminOnly: false },
+  { to: "/inventory", icon: "📦", label: "Inventory",    adminOnly: false },
 ];
 
 export default function Sidebar() {
+  const { user, isAdmin, logout } = useAuth();
+  const navigate                  = useNavigate();
+  const links = allLinks.filter(l => !l.adminOnly || isAdmin);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -31,9 +41,27 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="sidebar-footer">
-        v2.0 · React Edition
-      </div>
+      {/* User info + logout */}
+      {user && (
+        <div className="sidebar-user">
+          <div className="sidebar-user-info">
+            <div className="sidebar-user-avatar">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="sidebar-user-details">
+              <div className="sidebar-user-name">{user.name}</div>
+              <span className={`sidebar-role-badge ${user.role}`}>
+                {user.role === "admin" ? "🔑 Admin" : "👤 Employee"}
+              </span>
+            </div>
+          </div>
+          <button className="sidebar-logout-btn" onClick={handleLogout} title="Sign out">
+            ⏻
+          </button>
+        </div>
+      )}
+
+      <div className="sidebar-footer">v2.0 · React Edition</div>
     </aside>
   );
 }

@@ -4,6 +4,7 @@ from models.asset import Asset
 from models.user import User
 from models.assignment import Assignment
 from models.asset_log import AssetLog
+from routes.decorators import admin_required, login_required
 asset_bp = Blueprint("asset_bp", __name__)
 
 
@@ -94,6 +95,12 @@ def global_activity_json():
 
 @asset_bp.route("/assets", methods=["GET", "POST"])
 def assets_api():
+    from flask_jwt_extended import verify_jwt_in_request, get_jwt
+    # POST requires admin; GET is public for authenticated users
+    if request.method == "POST":
+        verify_jwt_in_request()
+        if get_jwt().get("role") != "admin":
+            return jsonify({"error": "Admin access required"}), 403
     if request.method == "GET":
         assets = Asset.query.all()
         return jsonify([a.to_dict() for a in assets])
@@ -117,6 +124,7 @@ def assets_api():
 
 
 @asset_bp.route("/assets/<int:asset_id>", methods=["DELETE"])
+@admin_required
 def delete_asset_api(asset_id):
     try:
         delete_asset(asset_id)
@@ -134,6 +142,7 @@ def list_users():
 
 
 @asset_bp.route("/assign", methods=["POST"])
+@login_required
 def assign_api():
     data = request.get_json()
 
@@ -161,6 +170,7 @@ def assign_api():
 
 
 @asset_bp.route("/return/<int:asset_id>", methods=["POST"])
+@login_required
 def return_asset_api(asset_id):
     try:
         return_asset(asset_id)

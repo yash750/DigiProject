@@ -1,62 +1,54 @@
-// Thin wrapper around the existing Flask API
-const BASE = "";  // proxy handles it (see package.json)
+const BASE = "";
 
-export async function fetchAssets() {
-  const res = await fetch(`${BASE}/assets`);
-  if (!res.ok) throw new Error("Failed to fetch assets");
-  return res.json();
+function authHeaders(extra = {}) {
+  const token = localStorage.getItem("am_access_token");
+  return {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extra,
+  };
 }
 
-export async function fetchUsers() {
-  const res = await fetch(`${BASE}/users`);
-  if (!res.ok) throw new Error("Failed to fetch users");
-  return res.json();
+async function request(url, options = {}) {
+  const res  = await fetch(`${BASE}${url}`, options);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
 }
 
-export async function assignAsset(payload) {
-  const res = await fetch(`${BASE}/assign`, {
+export const fetchAssets = () =>
+  request("/assets", { headers: authHeaders() });
+
+export const fetchUsers = () =>
+  request("/users", { headers: authHeaders() });
+
+export const assignAsset = (payload) =>
+  request("/assign", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: authHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Assignment failed");
-  return data;
-}
 
-export async function returnAsset(assetId) {
-  const res = await fetch(`${BASE}/return/${assetId}`, { method: "POST" });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Return failed");
-  return data;
-}
-
-export async function fetchHistory(assetId) {
-  const res = await fetch(`${BASE}/asset/${assetId}/history/json`);
-  if (!res.ok) throw new Error("Failed to fetch history");
-  return res.json();
-}
-
-export async function fetchActivity() {
-  const res = await fetch(`${BASE}/activity/json`);
-  if (!res.ok) throw new Error("Failed to fetch activity");
-  return res.json();
-}
-
-export async function createAsset(payload) {
-  const res = await fetch(`${BASE}/assets`, {
+export const returnAsset = (assetId) =>
+  request(`/return/${assetId}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: authHeaders(),
+  });
+
+export const fetchHistory = (assetId) =>
+  request(`/asset/${assetId}/history/json`, { headers: authHeaders() });
+
+export const fetchActivity = () =>
+  request("/activity/json", { headers: authHeaders() });
+
+export const createAsset = (payload) =>
+  request("/assets", {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to create asset");
-  return data;
-}
 
-export async function deleteAsset(assetId) {
-  const res = await fetch(`${BASE}/assets/${assetId}`, { method: "DELETE" });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to delete asset");
-  return data;
-}
+export const deleteAsset = (assetId) =>
+  request(`/assets/${assetId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
