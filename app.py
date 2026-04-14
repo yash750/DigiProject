@@ -15,7 +15,7 @@ def create_app():
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    from models import user, asset, assignment, asset_log
+    from models import user, asset, assignment, asset_log, organization
     from routes.asset_routes import asset_bp
     from routes.auth_routes import auth_bp, get_blocklist
     app.register_blueprint(asset_bp)

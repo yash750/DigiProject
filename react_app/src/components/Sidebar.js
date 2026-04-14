@@ -6,12 +6,14 @@ const allLinks = [
   { to: "/",          icon: "📊", label: "Dashboard",   adminOnly: false },
   { to: "/assign",    icon: "🔗", label: "Assign Asset", adminOnly: false },
   { to: "/add-asset", icon: "➕", label: "Add Asset",    adminOnly: true  },
+  { to: "/employees", icon: "👥", label: "Employees",    adminOnly: true  },
   { to: "/history",   icon: "📋", label: "History",      adminOnly: false },
   { to: "/inventory", icon: "📦", label: "Inventory",    adminOnly: false },
+  { to: "/profile",   icon: "👤", label: "My Profile",   adminOnly: false },
 ];
 
 export default function Sidebar() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, org, isAdmin, logout } = useAuth();
   const navigate                  = useNavigate();
   const links = allLinks.filter(l => !l.adminOnly || isAdmin);
 
@@ -61,7 +63,9 @@ export default function Sidebar() {
         </div>
       )}
 
-      <div className="sidebar-footer">v2.0 · React Edition</div>
+      <div className="sidebar-footer">
+        {org ? `🏢 ${org.name}` : "v2.0 · React Edition"}
+      </div>
     </aside>
   );
 }

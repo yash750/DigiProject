@@ -12,7 +12,7 @@ import React, { useEffect } from "react";
     onCancel={fn}
   />
 */
-export default function ConfirmModal({ open, title, body, confirmLabel = "Confirm", danger = false, onConfirm, onCancel }) {
+export default function ConfirmModal({ open, title, body, confirmLabel = "Confirm", danger = false, warningText = "This action cannot be undone.", warningDetail = "", onConfirm, onCancel }) {
   // Close on Escape
   useEffect(() => {
     if (!open) return;
@@ -41,10 +41,12 @@ export default function ConfirmModal({ open, title, body, confirmLabel = "Confir
 
         {/* Warning box */}
         <div style={warningBox}>
-          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#92400e" }}>⚠ This action cannot be undone.</span>
-          <span style={{ fontSize: "0.78rem", color: "#78350f", display: "block", marginTop: 3 }}>
-            All assignment history for this asset will also be permanently deleted.
-          </span>
+          <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#92400e" }}>⚠ {warningText}</span>
+          {warningDetail && (
+            <span style={{ fontSize: "0.78rem", color: "#78350f", display: "block", marginTop: 3 }}>
+              {warningDetail}
+            </span>
+          )}
         </div>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 20 }}>

@@ -52,3 +52,29 @@ export const deleteAsset = (assetId) =>
     method: "DELETE",
     headers: authHeaders(),
   });
+
+export const fetchAllUsers = () =>
+  request("/auth/users", { headers: authHeaders() });
+
+export const createUser = (payload) =>
+  request("/auth/users", {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+
+export const deleteUser = (userId) =>
+  request(`/auth/users/${userId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+export const getProfile = () =>
+  request("/auth/profile", { headers: authHeaders() });
+
+export const updateProfile = (payload) =>
+  request("/auth/profile", {
+    method: "PATCH",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });

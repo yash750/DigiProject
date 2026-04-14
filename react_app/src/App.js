@@ -11,13 +11,17 @@ import AssignPage   from "./pages/AssignPage";
 import AddAssetPage from "./pages/AddAssetPage";
 import HistoryPage  from "./pages/HistoryPage";
 import InventoryPage from "./pages/InventoryPage";
+import EmployeesPage from "./pages/EmployeesPage";
+import ProfilePage   from "./pages/ProfilePage";
 
 const pageMeta = {
-  "/":          { title: "Dashboard",    sub: "Overview of all assets and activity" },
-  "/assign":    { title: "Assign Asset", sub: "Assign an available asset to a team member" },
-  "/add-asset": { title: "Add Asset",    sub: "Register a new asset into the inventory" },
-  "/history":   { title: "History",      sub: "Full assignment timeline" },
-  "/inventory": { title: "Inventory",    sub: "Stock levels and asset type breakdown" },
+  "/":           { title: "Dashboard",    sub: "Overview of all assets and activity" },
+  "/assign":     { title: "Assign Asset", sub: "Assign an available asset to a team member" },
+  "/add-asset":  { title: "Add Asset",    sub: "Register a new asset into the inventory" },
+  "/employees":  { title: "Employees",    sub: "Manage employee accounts" },
+  "/history":    { title: "History",      sub: "Full assignment timeline" },
+  "/inventory":  { title: "Inventory",    sub: "Stock levels and asset type breakdown" },
+  "/profile":    { title: "My Profile",   sub: "View and edit your profile" },
 };
 
 function AppShell() {
@@ -65,6 +69,12 @@ function AppShell() {
               } />
               <Route path="/inventory" element={
                 <ProtectedRoute><InventoryPage /></ProtectedRoute>
+              } />
+              <Route path="/employees" element={
+                <ProtectedRoute adminOnly><EmployeesPage /></ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute><ProfilePage /></ProtectedRoute>
               } />
             </Routes>
           </main>
