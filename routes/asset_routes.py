@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt, get_jwt_identity
-from services.asset_service import assign_asset, return_asset, create_asset, delete_asset
+from services.asset_service import assign_asset, return_asset, transfer_asset, create_asset, delete_asset
 from models.asset import Asset
 from models.user import User
 from models.assignment import Assignment
@@ -69,19 +69,20 @@ def list_users():
     return jsonify([{"id": u.id, "name": u.name} for u in users])
 
 
-# ── Assign / Return ──────────────────────────────────────────────────────────
+# ── Assign / Return / Transfer ───────────────────────────────────────────────
 
 @asset_bp.route("/assign", methods=["POST"])
-@login_required
+@admin_required
 def assign_api():
     data = request.get_json()
     if not data:
         return jsonify({"error": "Invalid or missing JSON body"}), 400
-    if not all(k in data for k in ["asset_id", "to_user_id", "by_user_id"]):
+    if not all(k in data for k in ["asset_id", "to_user_id"]):
         return jsonify({"error": "Missing required fields"}), 400
     try:
         assign_asset(
-            data["asset_id"], data["to_user_id"], data["by_user_id"],
+            data["asset_id"], data["to_user_id"],
+            by_user_id=int(get_jwt_identity()),   # always the logged-in admin
             org_id=_org(), notes=data.get("notes"),
         )
         return jsonify({"message": "Assigned successfully"}), 201
@@ -97,6 +98,28 @@ def return_asset_api(asset_id):
     try:
         return_asset(asset_id, org_id=_org())
         return jsonify({"message": "Returned successfully"}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception:
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
+@asset_bp.route("/transfer/<int:asset_id>", methods=["POST"])
+@login_required
+def transfer_asset_api(asset_id):
+    """Employee transfers an asset they currently hold to another user."""
+    data = request.get_json()
+    if not data or not data.get("to_user_id"):
+        return jsonify({"error": "to_user_id is required"}), 400
+    try:
+        transfer_asset(
+            asset_id=asset_id,
+            to_user_id=int(data["to_user_id"]),
+            transferred_by_id=int(get_jwt_identity()),
+            org_id=_org(),
+            notes=data.get("notes"),
+        )
+        return jsonify({"message": "Asset transferred successfully"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception:

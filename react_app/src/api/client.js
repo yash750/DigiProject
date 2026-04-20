@@ -28,6 +28,13 @@ export const assignAsset = (payload) =>
     body: JSON.stringify(payload),
   });
 
+export const transferAsset = (assetId, payload) =>
+  request(`/transfer/${assetId}`, {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+
 export const returnAsset = (assetId) =>
   request(`/return/${assetId}`, {
     method: "POST",

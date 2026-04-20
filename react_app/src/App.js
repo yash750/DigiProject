@@ -16,7 +16,7 @@ import ProfilePage   from "./pages/ProfilePage";
 
 const pageMeta = {
   "/":           { title: "Dashboard",    sub: "Overview of all assets and activity" },
-  "/assign":     { title: "Assign Asset", sub: "Assign an available asset to a team member" },
+  "/assign":     { title: "Assign / Transfer", sub: "Assign an asset (admin) or transfer your held asset (employee)" },
   "/add-asset":  { title: "Add Asset",    sub: "Register a new asset into the inventory" },
   "/employees":  { title: "Employees",    sub: "Manage employee accounts" },
   "/history":    { title: "History",      sub: "Full assignment timeline" },

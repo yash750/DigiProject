@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 
 const allLinks = [
   { to: "/",          icon: "📊", label: "Dashboard",   adminOnly: false },
-  { to: "/assign",    icon: "🔗", label: "Assign Asset", adminOnly: false },
+  { to: "/assign",    icon: "🔗", label: "Assign / Transfer", adminOnly: false },
   { to: "/add-asset", icon: "➕", label: "Add Asset",    adminOnly: true  },
   { to: "/employees", icon: "👥", label: "Employees",    adminOnly: true  },
   { to: "/history",   icon: "📋", label: "History",      adminOnly: false },

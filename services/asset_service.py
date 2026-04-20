@@ -108,6 +108,61 @@ def assign_asset(asset_id, to_user_id, by_user_id, org_id, notes=None):
     return assignment
 
 
+def transfer_asset(asset_id, to_user_id, transferred_by_id, org_id, notes=None):
+    """Close the current assignment and immediately open a new one for to_user_id."""
+    from models.user import User
+    now = datetime.now(timezone.utc)
+
+    asset = (db.session.query(Asset)
+             .filter_by(id=asset_id, org_id=org_id)
+             .with_for_update().first())
+    if not asset:
+        raise ValueError("Asset not found")
+    if asset.status != Asset.STATUS_ASSIGNED:
+        raise ValueError("Asset is not currently assigned")
+
+    active = asset.assignments.filter_by(returned_at=None).first()
+    if not active:
+        raise ValueError("No active assignment found")
+
+    # Verify the caller is the current holder
+    if active.assigned_to_user_id != transferred_by_id:
+        raise ValueError("You can only transfer assets currently assigned to you")
+
+    to_user   = User.query.filter_by(id=to_user_id,       org_id=org_id).first()
+    from_user = User.query.filter_by(id=transferred_by_id, org_id=org_id).first()
+    if not to_user:
+        raise ValueError("Recipient not found in your organization")
+    if to_user_id == transferred_by_id:
+        raise ValueError("You cannot transfer an asset to yourself")
+
+    # Close current assignment
+    active.returned_at = now
+    _log(AssetLog.EVENT_RETURNED, asset, org_id=org_id,
+         actor=from_user.name,
+         detail=f"Transferred to {to_user.name}" + (f" — {notes}" if notes else ""))
+
+    # Open new assignment
+    new_assignment = Assignment(
+        asset_id=asset.id,
+        assigned_to_user_id=to_user_id,
+        assigned_by_user_id=transferred_by_id,
+        assigned_at=now,
+        notes=notes,
+    )
+    db.session.add(new_assignment)
+    _log(AssetLog.EVENT_ASSIGNED, asset, org_id=org_id,
+         actor=from_user.name,
+         detail=f"Transferred from {from_user.name} to {to_user.name}" + (f" — {notes}" if notes else ""))
+
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    return new_assignment
+
+
 def return_asset(asset_id, org_id):
     asset = Asset.query.filter_by(id=asset_id, org_id=org_id).first()
     if not asset:
