@@ -3,8 +3,10 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import { ToastProvider } from "./components/Toast";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import QuickActionsWidget from "./components/QuickActionsWidget";
+import ThemePicker from "./components/ThemePicker";
 import LoginPage    from "./pages/LoginPage";
 import Dashboard    from "./pages/Dashboard";
 import AssignPage   from "./pages/AssignPage";
@@ -45,6 +47,7 @@ function AppShell() {
               <div className="topbar-sub">{meta.sub}</div>
             </div>
             <div className="topbar-right">
+              <ThemePicker />
               <span className="badge-dot" />
               <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
                 Connected to Flask API
@@ -92,8 +95,10 @@ function AppShell() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppShell />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppShell />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
