@@ -85,3 +85,31 @@ export const updateProfile = (payload) =>
     headers: authHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
+
+// ── Asset Requests ────────────────────────────────────────────────────────────
+
+export const fetchMyRequests = () =>
+  request("/requests", { headers: authHeaders() });
+
+export const fetchOpenRequests = () =>
+  request("/requests/open", { headers: authHeaders() });
+
+export const createRequest = (payload) =>
+  request("/requests", {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+
+export const actionRequest = (reqId, payload) =>
+  request(`/requests/${reqId}`, {
+    method: "PATCH",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+
+export const cancelRequest = (reqId) =>
+  request(`/requests/${reqId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });

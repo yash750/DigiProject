@@ -15,11 +15,13 @@ def create_app():
     jwt.init_app(app)
     migrate.init_app(app, db)
 
-    from models import user, asset, assignment, asset_log, organization
+    from models import user, asset, assignment, asset_log, organization, asset_request
     from routes.asset_routes import asset_bp
     from routes.auth_routes import auth_bp, get_blocklist
+    from routes.request_routes import request_bp
     app.register_blueprint(asset_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(request_bp)
 
     # Revoke logged-out tokens
     @jwt.token_in_blocklist_loader

@@ -13,13 +13,15 @@ import HistoryPage  from "./pages/HistoryPage";
 import InventoryPage from "./pages/InventoryPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import ProfilePage   from "./pages/ProfilePage";
+import RequestsPage  from "./pages/RequestsPage";
 
 const pageMeta = {
   "/":           { title: "Dashboard",    sub: "Overview of all assets and activity" },
   "/assign":     { title: "Assign / Transfer", sub: "Assign an asset (admin) or transfer your held asset (employee)" },
   "/add-asset":  { title: "Add Asset",    sub: "Register a new asset into the inventory" },
-  "/employees":  { title: "Employees",    sub: "Manage employee accounts" },
-  "/history":    { title: "History",      sub: "Full assignment timeline" },
+  "/employees":  { title: "Employees",       sub: "Manage employee accounts" },
+  "/requests":   { title: "Requests",         sub: "Request assets or view the open board" },
+  "/history":    { title: "History",          sub: "Full assignment timeline" },
   "/inventory":  { title: "Inventory",    sub: "Stock levels and asset type breakdown" },
   "/profile":    { title: "My Profile",   sub: "View and edit your profile" },
 };
@@ -72,6 +74,9 @@ function AppShell() {
               } />
               <Route path="/employees" element={
                 <ProtectedRoute adminOnly><EmployeesPage /></ProtectedRoute>
+              } />
+              <Route path="/requests" element={
+                <ProtectedRoute><RequestsPage /></ProtectedRoute>
               } />
               <Route path="/profile" element={
                 <ProtectedRoute><ProfilePage /></ProtectedRoute>

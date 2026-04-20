@@ -3,13 +3,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const allLinks = [
-  { to: "/",          icon: "📊", label: "Dashboard",   adminOnly: false },
+  { to: "/",          icon: "📊", label: "Dashboard",        adminOnly: false },
   { to: "/assign",    icon: "🔗", label: "Assign / Transfer", adminOnly: false },
-  { to: "/add-asset", icon: "➕", label: "Add Asset",    adminOnly: true  },
-  { to: "/employees", icon: "👥", label: "Employees",    adminOnly: true  },
-  { to: "/history",   icon: "📋", label: "History",      adminOnly: false },
-  { to: "/inventory", icon: "📦", label: "Inventory",    adminOnly: false },
-  { to: "/profile",   icon: "👤", label: "My Profile",   adminOnly: false },
+  { to: "/requests",  icon: "📬", label: "Requests",          adminOnly: false },
+  { to: "/add-asset", icon: "➕", label: "Add Asset",         adminOnly: true  },
+  { to: "/employees", icon: "👥", label: "Employees",         adminOnly: true  },
+  { to: "/history",   icon: "📋", label: "History",           adminOnly: false },
+  { to: "/inventory", icon: "📦", label: "Inventory",         adminOnly: false },
+  { to: "/profile",   icon: "👤", label: "My Profile",        adminOnly: false },
 ];
 
 export default function Sidebar() {
