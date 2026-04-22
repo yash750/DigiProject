@@ -10,6 +10,7 @@ class AssetLog(db.Model):
     EVENT_DELETED  = "deleted"
     EVENT_ASSIGNED = "assigned"
     EVENT_RETURNED = "returned"
+    EVENT_UPDATED  = "updated"
 
     id            = db.Column(db.Integer, primary_key=True)
     org_id        = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=True, index=True)

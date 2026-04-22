@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import verify_jwt_in_request, get_jwt, get_jwt_identity
-from services.asset_service import assign_asset, return_asset, transfer_asset, create_asset, delete_asset
+from services.asset_service import assign_asset, return_asset, transfer_asset, create_asset, delete_asset, update_asset, bulk_add_units
 from models.asset import Asset
 from models.user import User
 from models.assignment import Assignment
@@ -47,12 +47,51 @@ def assets_api():
         return jsonify({"error": "Internal Server Error"}), 500
 
 
-@asset_bp.route("/assets/<int:asset_id>", methods=["DELETE"])
+@asset_bp.route("/assets/bulk", methods=["POST"])
 @admin_required
-def delete_asset_api(asset_id):
+def bulk_add_api():
+    data = request.get_json() or {}
+    name  = data.get("name", "").strip()
+    count = data.get("count", 1)
+    if not name:
+        return jsonify({"error": "name is required"}), 400
     try:
-        delete_asset(asset_id, org_id=_org())
-        return jsonify({"message": "Asset deleted"}), 200
+        assets = bulk_add_units(name, int(count), org_id=_org(),
+                                base_serial=data.get("base_serial"))
+        return jsonify([a.to_dict() for a in assets]), 201
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception:
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
+@asset_bp.route("/assets/<int:asset_id>", methods=["DELETE", "PATCH"])
+@admin_required
+def asset_detail_api(asset_id):
+    if request.method == "DELETE":
+        try:
+            delete_asset(asset_id, org_id=_org())
+            return jsonify({"message": "Asset deleted"}), 200
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception:
+            return jsonify({"error": "Internal Server Error"}), 500
+
+    # PATCH
+    data = request.get_json() or {}
+    try:
+        from flask_jwt_extended import get_jwt_identity
+        from models.user import User
+        actor_id = int(get_jwt_identity())
+        actor = User.query.get(actor_id)
+        asset = update_asset(
+            asset_id, org_id=_org(),
+            actor=actor.name if actor else None,
+            name=data.get("name"),
+            serial_number=data.get("serial_number"),
+            status=data.get("status"),
+        )
+        return jsonify(asset.to_dict()), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception:
@@ -164,7 +203,7 @@ def asset_history_json(asset_id):
             "timestamp": l.timestamp.isoformat() if l.timestamp else None,
         }
         for l in logs
-        if l.event in (AssetLog.EVENT_CREATED, AssetLog.EVENT_DELETED)
+        if l.event in (AssetLog.EVENT_CREATED, AssetLog.EVENT_DELETED, AssetLog.EVENT_UPDATED)
     ]
 
     timeline = sorted(

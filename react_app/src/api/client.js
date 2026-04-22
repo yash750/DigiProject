@@ -54,6 +54,20 @@ export const createAsset = (payload) =>
     body: JSON.stringify(payload),
   });
 
+export const bulkAddUnits = (payload) =>
+  request("/assets/bulk", {
+    method: "POST",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+
+export const updateAsset = (assetId, payload) =>
+  request(`/assets/${assetId}`, {
+    method: "PATCH",
+    headers: authHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify(payload),
+  });
+
 export const deleteAsset = (assetId) =>
   request(`/assets/${assetId}`, {
     method: "DELETE",
