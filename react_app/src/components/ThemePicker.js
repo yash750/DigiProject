@@ -2,11 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "../context/ThemeContext";
 
 const SWATCHES = {
-  light:  "#3b82f6",
-  dark:   "#60a5fa",
-  ocean:  "#0284c7",
-  forest: "#16a34a",
-  sunset: "#a855f7",
+  light: "#3b82f6",
+  dark:  "#60a5fa",
 };
 
 export default function ThemePicker() {

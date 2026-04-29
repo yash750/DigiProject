@@ -11,11 +11,15 @@ import {
 export default function Dashboard() {
   const [assets, setAssets]     = useState([]);
   const [loading, setLoading]   = useState(true);
-  const [search, setSearch]     = useState("");
-  const [filter, setFilter]     = useState("all");
+  const [search, setSearch]     = useState(() => localStorage.getItem("dash_search") || "");
+  const [filter, setFilter]     = useState(() => localStorage.getItem("dash_filter") || "all");
   const [returning, setReturning] = useState(null);
   const toast    = useToast();
   const navigate = useNavigate();
+
+  // Flexibility: persist search + filter across page refreshes
+  const handleSearch = (val) => { setSearch(val); localStorage.setItem("dash_search", val); };
+  const handleFilter = (val) => { setFilter(val); localStorage.setItem("dash_filter", val); };
 
   const load = useCallback(async () => {
     try {
@@ -112,14 +116,16 @@ export default function Dashboard() {
           <div className="toolbar">
             <input
               className="search-input"
-              placeholder="🔍  Search name, serial, holder…"
+              placeholder="Search name, serial, holder…"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
+              aria-label="Search assets"
             />
             <select
               className="filter-select"
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) => handleFilter(e.target.value)}
+              aria-label="Filter by status"
             >
               <option value="all">All Statuses</option>
               <option value="available">Available</option>
@@ -134,7 +140,9 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="loader-wrap"><div className="spinner" /></div>
+          <div className="loader-wrap" role="status" aria-label="Loading assets">
+            <div className="spinner" />
+          </div>
         ) : visible.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📭</div>

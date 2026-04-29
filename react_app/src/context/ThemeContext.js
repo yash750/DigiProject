@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 export const THEMES = [
-  { id: "light",  label: "Light",  icon: "☀️" },
-  { id: "dark",   label: "Dark",   icon: "🌙" },
-  { id: "ocean",  label: "Ocean",  icon: "🌊" },
-  { id: "forest", label: "Forest", icon: "🌲" },
-  { id: "sunset", label: "Sunset", icon: "🌆" },
+  { id: "light", label: "Light", icon: "☀️" },
+  { id: "dark",  label: "Dark",  icon: "🌙" },
 ];
 
 const ThemeContext = createContext(null);

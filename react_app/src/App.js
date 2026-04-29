@@ -38,6 +38,20 @@ function AppShell() {
 
   return (
     <ToastProvider>
+      {/* Accessibility: skip-to-content link for keyboard users */}
+      <a
+        href="#main-content"
+        style={{
+          position: "absolute", top: -40, left: 8,
+          background: "var(--primary)", color: "#fff",
+          padding: "8px 16px", borderRadius: 8, fontSize: "0.85rem",
+          zIndex: 9999, transition: "top 0.15s",
+        }}
+        onFocus={e => e.target.style.top = "8px"}
+        onBlur={e  => e.target.style.top = "-40px"}
+      >
+        Skip to content
+      </a>
       <div className="layout">
         <Sidebar />
         <div className="main">
@@ -48,14 +62,14 @@ function AppShell() {
             </div>
             <div className="topbar-right">
               <ThemePicker />
-              <span className="badge-dot" />
-              <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+              <span className="badge-dot" aria-hidden="true" />
+              <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }} aria-label="API connection status: connected">
                 Connected to Flask API
               </span>
             </div>
           </header>
 
-          <main className="page-content">
+          <main className="page-content" id="main-content" role="main">
             <Routes>
               <Route path="/" element={
                 <ProtectedRoute><Dashboard /></ProtectedRoute>

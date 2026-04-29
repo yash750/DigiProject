@@ -58,7 +58,12 @@ export default function Sidebar() {
               </span>
             </div>
           </div>
-          <button className="sidebar-logout-btn" onClick={handleLogout} title="Sign out">
+          <button
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+            title="Sign out"
+            aria-label="Sign out"
+          >
             ⏻
           </button>
         </div>
